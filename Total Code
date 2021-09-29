@@ -1,0 +1,374 @@
+//right back 1
+2 // left frond 3
+3 #include <Wire.h>
+4 #include <Adafruit_PWMServoDriver.h>
+5 #include<SoftwareSerial.h>
+6 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
+7
+8 #define SERVOMIN 125
+9 #define SERVOMAX 575
+10 #define SPEAKER 11
+11 int const trigPin = 9;
+12 int const echoPin = 10;
+13 int const buzzPin = 5;
+14 int smokeA0 = A0;
+15 // Your threshold value
+16 int sensorThres = 400;
+17 // our servo # counter
+18 uint8_t servonum = 0;
+19 int p=40;
+20 int q;
+21 int r;
+22 int s;
+23 void setup() {
+24 pinMode(trigPin, OUTPUT); // trig pin will have pulses output
+25 pinMode(echoPin, INPUT); // echo pin should be input to get pulse width
+26 pinMode(buzzPin, OUTPUT); // buzz pin is output to control buzzering
+27 pinMode(SPEAKER,OUTPUT); // important to set pin as output
+28 pinMode(smokeA0, INPUT); // set pin to analog A0
+29 Serial.begin(9600);
+30 Serial.println("16 channel Servo test!");
+31
+32 pwm.begin();
+33
+34 pwm.setPWMFreq(60);
+35
+36 //yield();
+37 }
+38
+39
+40 void loop() {
+41 // Duration will be the input pulse width and distance will be the distance to the obstacle in centimeters
+42 int duration, distance;
+43 // Output pulse with 1ms width on trigPin
+44 digitalWrite(trigPin, HIGH);
+45 delay(1);
+46 digitalWrite(trigPin, LOW);
+47 // Measure the pulse input in echo pin
+48 duration = pulseIn(echoPin, HIGH);
+49 // Distance is half the duration devided by 29.1 (from datasheet)
+50 distance = (duration/2) / 29.1;
+51 // if distance less than 0.5 meter and more than 0 (0 or less means over range) j
+52 if (distance <= 30 && distance >= 0) {
+53 meow2();
+54
+55
+56 delay(1000);
+57 }
+58 // Waiting 60 ms won’t hurt any one
+59 delay(60);
+60 // Prints the distance on the Serial Monitor
+61 Serial.print("Distance: ");
+62 Serial.print(distance);
+63 Serial.println(" cm");
+64 delay(500);
+65 //Gas Detection
+66 int analogSensor = analogRead(smokeA0);
+
+68 Serial.print("Pin A0: ");
+69 Serial.println(analogSensor);
+70 // Checks if it has reached the threshold value
+71 if (analogSensor > sensorThres)
+72 {
+73 tone(SPEAKER, 1000, 200);
+74 }
+75 else
+76 {
+77 noTone(SPEAKER);
+78 }
+79 delay(100);
+80
+81 char x;
+82
+83 if(Serial.available()>0){
+84
+85 x = mySerial.read();
+86
+87
+88 if(x==’F’) //data sent from the controller app on your android phone
+89 {
+90 Serial.print("FO");
+91
+92
+93 //left 1
+94
+95 pwm.setPWM(1, 0, angleToPulse(60 ) );
+96
+97 pwm.setPWM(2, 0, angleToPulse(40) );
+98 pwm.setPWM(3, 0, angleToPulse(130 ) );
+99
+100 pwm.setPWM(4, 0, angleToPulse(90) );
+101
+102
+103 ////another 2 paires
+104 pwm.setPWM(7, 0, angleToPulse(50) );
+105 delay(40);
+106 pwm.setPWM(6, 0, angleToPulse(120) );
+107 pwm.setPWM(7, 0, angleToPulse(140) );
+108 delay(40);//b100
+109 pwm.setPWM(9, 0, angleToPulse(90) );//b100
+110 delay(40);
+111 pwm.setPWM(8, 0, angleToPulse(50 ) );//b150
+112 delay(500);
+113
+114
+115
+116
+117
+118 pwm.setPWM(2, 0, angleToPulse(90) );//b100
+119 delay(40);
+120
+121 pwm.setPWM(1, 0, angleToPulse(130 ) );//b150
+122 pwm.setPWM(2, 0, angleToPulse(80) );//b100
+123 delay(40);
+124 pwm.setPWM(4, 0, angleToPulse(100) );
+125 delay(40);//b100
+126 pwm.setPWM(3, 0, angleToPulse(60 ) );//b150
+127 delay(40);//b100
+128 pwm.setPWM(4, 0, angleToPulse(40) );//b100
+129 delay(40);//b100
+130
+131
+132
+133 pwm.setPWM(6, 0, angleToPulse(40) );//b150
+134
+135 pwm.setPWM(7, 0, angleToPulse(90) );//b100
+136 delay(40);//b100
+137 pwm.setPWM(8, 0, angleToPulse(120 ) );//b150
+138
+139 pwm.setPWM(9, 0, angleToPulse(140) );//b100
+140 delay(500);
+141 }
+142 if(x==’B’) //data sent from the controller app on your android phone
+143 {
+144
+145 Serial.print("BA");
+146
+147 pwm.setPWM(1, 0, angleToPulse(60 ) );
+148
+149 pwm.setPWM(2, 0, angleToPulse(40) );
+150 pwm.setPWM(3, 0, angleToPulse(130 ) );
+151
+152 pwm.setPWM(4, 0, angleToPulse(90) );
+153
+154
+155 ////another 2 paires
+156 pwm.setPWM(7, 0, angleToPulse(50) );
+157 delay(40);
+158 pwm.setPWM(6, 0, angleToPulse(120) );
+159 pwm.setPWM(7, 0, angleToPulse(140) );
+160 delay(40);//b100
+161 pwm.setPWM(9, 0, angleToPulse(90) );//b100
+162 delay(40);
+163 pwm.setPWM(8, 0, angleToPulse(50 ) );//b150
+164 delay(500);
+165
+166
+167
+168
+169
+170 pwm.setPWM(2, 0, angleToPulse(90) );//b100
+171 delay(40);
+172
+173 pwm.setPWM(1, 0, angleToPulse(130 ) );//b150
+174 pwm.setPWM(2, 0, angleToPulse(80) );//b100
+175 delay(40);
+176 pwm.setPWM(4, 0, angleToPulse(100) );
+177 delay(40);//b100
+178 pwm.setPWM(3, 0, angleToPulse(60 ) );//b150
+179 delay(40);//b100
+180 pwm.setPWM(4, 0, angleToPulse(40) );//b100
+181 delay(40);//b100
+182
+183
+184
+185 pwm.setPWM(6, 0, angleToPulse(40) );//b150
+186
+187 pwm.setPWM(7, 0, angleToPulse(90) );//b100
+188 delay(40);//b100
+189 pwm.setPWM(8, 0, angleToPulse(120 ) );//b150
+190
+191 pwm.setPWM(9, 0, angleToPulse(140) );//b100
+192 delay(500);
+193 }
+194 if(x==’R’) //data sent from the controller app on your android phone
+195 {
+196
+197 Serial.print("RI");
+198
+199 pwm.setPWM(1, 0, angleToPulse(60 ) );
+200
+201 pwm.setPWM(2, 0, angleToPulse(40) );
+202 pwm.setPWM(3, 0, angleToPulse(130 ) );
+203
+204 pwm.setPWM(4, 0, angleToPulse(90) );
+205
+206
+207 ////another 2 paires
+208 pwm.setPWM(7, 0, angleToPulse(50) );
+209 delay(40);
+210 pwm.setPWM(6, 0, angleToPulse(120) );
+211 pwm.setPWM(7, 0, angleToPulse(140) );
+212 delay(40);//b100
+213 pwm.setPWM(9, 0, angleToPulse(90) );//b100
+214 delay(40);
+215 pwm.setPWM(8, 0, angleToPulse(50 ) );//b150
+216 delay(500);
+217
+218
+219
+220
+221
+222 pwm.setPWM(2, 0, angleToPulse(90) );//b100
+223 delay(40);
+224
+225 pwm.setPWM(1, 0, angleToPulse(130 ) );//b150
+226 pwm.setPWM(2, 0, angleToPulse(80) );//b100
+227 delay(40);
+228 pwm.setPWM(4, 0, angleToPulse(100) );
+229 delay(40);//b100
+230 pwm.setPWM(3, 0, angleToPulse(60 ) );//b150
+231 delay(40);//b100
+232 pwm.setPWM(4, 0, angleToPulse(40) );//b100
+233 delay(40);//b100
+234
+235
+236
+237 pwm.setPWM(6, 0, angleToPulse(40) );//b150
+238
+239 pwm.setPWM(7, 0, angleToPulse(90) );//b100
+240 delay(40);//b100
+241 pwm.setPWM(8, 0, angleToPulse(120 ) );//b150
+242
+243 pwm.setPWM(9, 0, angleToPulse(140) );//b100
+244 delay(500);
+245 }
+246 if(x==’L’) //data sent from the controller app on your android phone
+247 {
+248
+249 Serial.print("LE");
+250 pwm.setPWM(1, 0, angleToPulse(60 ) );
+251
+252 pwm.setPWM(2, 0, angleToPulse(40) );
+253 pwm.setPWM(3, 0, angleToPulse(130 ) );
+254
+255 pwm.setPWM(4, 0, angleToPulse(90) );
+256
+257
+258 ////another 2 paires
+259 pwm.setPWM(7, 0, angleToPulse(50) );
+260 delay(40);
+261 pwm.setPWM(6, 0, angleToPulse(120) );
+262 pwm.setPWM(7, 0, angleToPulse(140) );
+263 delay(40);//b100
+264 pwm.setPWM(9, 0, angleToPulse(90) );//b100
+265 delay(40);
+266 pwm.setPWM(8, 0, angleToPulse(50 ) );//b150
+267 delay(500);
+268
+269
+270
+271
+272
+273 pwm.setPWM(2, 0, angleToPulse(90) );//b100
+274 delay(40);
+275
+276 pwm.setPWM(1, 0, angleToPulse(130 ) );//b150
+277 pwm.setPWM(2, 0, angleToPulse(80) );//b100
+278 delay(40);
+279 pwm.setPWM(4, 0, angleToPulse(100) );
+280 delay(40);//b100
+281 pwm.setPWM(3, 0, angleToPulse(60 ) );//b150
+282 delay(40);//b100
+283 pwm.setPWM(4, 0, angleToPulse(40) );//b100
+284 delay(40);//b100
+285
+286
+287
+288 pwm.setPWM(6, 0, angleToPulse(40) );//b150
+289
+290 pwm.setPWM(7, 0, angleToPulse(90) );//b100
+291 delay(40);//b100
+292 pwm.setPWM(8, 0, angleToPulse(120 ) );//b150
+293
+294 pwm.setPWM(9, 0, angleToPulse(140) );//b100
+295 delay(500);
+296 }
+297 if(x==’S’){ //data sent from the controller app on your android phone
+298
+299
+300 Serial.print("stop");
+301
+302 pwm.setPWM(0, 0, angleToPulse(0) );
+303 pwm.setPWM(1, 0, angleToPulse(0) );
+304 pwm.setPWM(2, 0, angleToPulse(0) );
+305 pwm.setPWM(3, 0, angleToPulse(0) );
+306 pwm.setPWM(4, 0, angleToPulse(0) );
+307 pwm.setPWM(5, 0, angleToPulse(0) );
+308 pwm.setPWM(6, 0, angleToPulse(0) );
+309 pwm.setPWM(7, 0, angleToPulse(0) );
+310 pwm.setPWM(8, 0, angleToPulse(0) );
+311 pwm.setPWM(9, 0, angleToPulse(0) );
+312 pwm.setPWM(10, 0, angleToPulse(0) );
+313 pwm.setPWM(11, 0, angleToPulse(0) );
+314 pwm.setPWM(12, 0, angleToPulse(0) );
+315 pwm.setPWM(13, 0, angleToPulse(0) );
+316 pwm.setPWM(14, 0, angleToPulse(0) );
+317 pwm.setPWM(15, 0, angleToPulse(0) );
+318
+319 }
+320
+321
+322
+323
+324
+325 delay(500);// wait for 1 second
+326
+327 }
+328
+329 void meow() { // cat meow (emphasis ow "me")
+330 uint16_t i;
+331 playTone(3100,50); // "m" (short)
+332 playTone(304,180); // "eee" (long)
+333 for(i=990; i<1022; i+=2) // vary "ooo" down
+334 playTone(i,8);
+335 playTone(6100,40); // "w" (short)
+336 }
+337
+338 void meow2() { // cat meow (emphasis on "ow")
+339 uint16_t i;
+340 playTone(5100,55);
+341 playTone(394,170); // "eee" (long)
+342 delay(30); // wait a tiny bit
+343 for(i=330; i<360; i+=2) // vary "ooo" down
+344 playTone(i,10);
+345 playTone(5100,40); // "w" (short)
+346 }
+347
+348 void mew() { // cat mew
+349 uint16_t i;
+350 playTone(5100,55); // "m" (short)
+351 playTone(394,130); // "eee" (long)
+352 playTone(384,35); // "eee" (up a tiny bit on end)
+353 playTone(5100,40); // "w" (short)
+354 }
+355
+356
+357 // play tone on a piezo speaker: tone shorter values produce higher frequencies
+358 // which is opposite beep() but avoids some math delay - similar to code by Erin Robotgrrl
+359
+360 void playTone(uint16_t tone1, uint16_t duration) {
+361 if(tone1 < 50 || tone1 > 15000) return; // these do not play on a piezo
+362 for (long i = 0; i < duration * 1000L; i += tone1 * 2) {
+363 digitalWrite(SPEAKER, HIGH);
+364 delayMicroseconds(tone1);
+365 digitalWrite(SPEAKER, LOW);
+366 delayMicroseconds(tone1);
+367 }
+368 }
+369
+370 int angleToPulse(int ang){
+371 int pulse = map(ang,0, 180, SERVOMIN,SERVOMAX);
+372 Serial.print("Angle: ");Serial.print(ang);
+373 Serial.print(" pulse: ");Serial.println(pulse);
+374 return pulse;}
